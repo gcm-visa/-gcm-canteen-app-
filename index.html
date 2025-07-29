@@ -11,40 +11,42 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 40px;
-    }
-    h1 {
-      color: #4CAF50;
+      padding: 50px;
     }
     #installBtn {
-      padding: 12px 24px;
-      font-size: 16px;
+      padding: 10px 20px;
+      font-size: 18px;
       background-color: #4CAF50;
       color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       display: none;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
   <h1>🍽 GCM Canteen Billing System</h1>
-  <p>Install this app to proceed.</p>
-
+  <p id="statusMsg">Install this app to proceed.</p>
   <button id="installBtn">📲 Install App</button>
 
   <script>
-    const redirectURL = "https://script.google.com/a/macros/gcm.edu.ph/s/AKfycbwtzOOKBLNCaw0kVhh91-MbOw3LQ55ep2sIZ1CmddNItNEyKcr9eNe8JYPBSzH4uwGx6w/exec";
+    const redirectUrl = "https://script.google.com/a/macros/gcm.edu.ph/s/AKfycbwtzOOKBLNCaw0kVhh91-MbOw3LQ55ep2sIZ1CmddNItNEyKcr9eNe8JYPBSzH4uwGx6w/exec";
 
+    // Redirect immediately if app already installed
+    window.addEventListener('appinstalled', () => {
+      window.location.href = redirectUrl;
+    });
+
+    // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('✅ Service Worker Registered'))
-        .catch(err => console.error('❌ SW registration failed:', err));
+      navigator.serviceWorker.register('service-worker.js').catch(console.error);
     }
 
     let deferredPrompt;
     const installBtn = document.getElementById('installBtn');
+    const statusMsg = document.getElementById('statusMsg');
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
@@ -52,22 +54,27 @@
       installBtn.style.display = 'inline-block';
 
       installBtn.addEventListener('click', () => {
+        installBtn.style.display = 'none';
         deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choiceResult => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('✅ App installed');
+        deferredPrompt.userChoice.then(choice => {
+          if (choice.outcome === 'accepted') {
+            statusMsg.textContent = "✅ App installed. Redirecting...";
+            setTimeout(() => {
+              window.location.href = redirectUrl;
+            }, 1500);
           } else {
-            console.log('❌ App installation declined');
+            statusMsg.textContent = "❌ Installation cancelled.";
           }
-          installBtn.style.display = 'none';
           deferredPrompt = null;
         });
       });
     });
 
-    window.addEventListener('appinstalled', () => {
-      console.log('✅ App successfully installed');
-      window.location.href = redirectURL;
+    // If PWA is already installed (bypass install screen)
+    window.addEventListener('load', () => {
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        window.location.href = redirectUrl;
+      }
     });
   </script>
 </body>
