@@ -1,13 +1,20 @@
 {
-  "name": "GCM Canteen App",
+  "name": "GCM Canteen Billing",
   "short_name": "Canteen",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "index.html",
   "display": "standalone",
-  "theme_color": "#2e7d32",
-  "background_color": "#1b5e20",
+  "background_color": "#ffffff",
+  "theme_color": "#28a745",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ]
 }
