@@ -1,367 +1,157 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base target="_top">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GCM Canteen Login</title>
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2e7d32" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" referrerpolicy="no-referrer" />
+
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
+      background-color: #1b5e20;
+      min-height: 100vh;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
     }
 
-    /* LOGIN STYLES */
-    #login-screen {
+    .login-box {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px 25px;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+      border: 1px solid #c8e6c9;
+    }
+
+    .login-box h3 {
+      color: #2e7d32;
+      margin-bottom: 20px;
+      font-size: 22px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px 10px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    .login-box button {
+      padding: 12px;
+      font-size: 16px;
+      background: #2e7d32;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      border-radius: 8px;
+      font-weight: bold;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      background: #27ae60;
-      color: white;
+      gap: 10px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
-    #login-screen input {
-      padding: 10px;
-      margin: 5px;
-      font-size: 16px;
-      width: 220px;
+    .login-box button:hover {
+      background-color: #1b5e20;
+      transform: scale(1.02);
     }
 
-    #login-screen button {
-      padding: 10px 20px;
-      margin-top: 10px;
-      background: white;
-      color: #27ae60;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
+    #installBtn {
+      margin-top: 15px;
+      display: none;
     }
 
-    #pos-app { display: none; } /* Hidden initially */
-
-    /* --- your POS styles start here --- */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background: #27ae60;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-    }
-
-    .container {
-      display: flex;
-      height: calc(100vh - 50px);
-    }
-
-    .product-panel {
-      width: 60%;
-      padding: 20px;
-      overflow-y: auto;
-      border-right: 1px solid #ddd;
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 15px;
-    }
-
-    .product {
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      transition: transform 0.2s;
-    }
-
-    .product:hover { transform: scale(1.05); }
-    .product img { width: 100%; height: 90px; object-fit: cover; }
-    .product-name { padding: 10px; font-size: 14px; font-weight: 500; }
-    .low-stock { color: red; }
-
-    .order-panel {
-      width: 40%;
-      background: white;
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .order-header { display: flex; justify-content: space-between; font-size: 18px; font-weight: bold; margin-bottom: 10px; }
-    .order-items { flex-grow: 1; overflow-y: auto; }
-
-    .item-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 5px 0; }
-    .item-name { flex: 1; text-align: right; padding-right: 10px; }
-    .item-qty { flex: 1; display: flex; justify-content: center; align-items: center; gap: 8px; }
-    .item-price { flex: 1; text-align: right; padding-right: 10px; }
-    .item-qty button { padding: 4px 8px; font-size: 14px; border: none; background-color: #eee; cursor: pointer; }
-
-    .total { font-size: 22px; font-weight: bold; text-align: right; margin-top: 10px; color: #27ae60; }
-
-    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-    .actions button {
-      padding: 10px 20px;
-      font-size: 14px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .checkout-btn { background-color: #27ae60; color: white; }
-    .clear-btn { background-color: #e74c3c; color: white; }
-
-    .sales-summary { font-size: 14px; text-align: center; margin-top: 10px; color: #888; }
-
-    .money-input, .payment-summary {
-      margin-top: 10px;
-      text-align: right;
-      font-size: 14px;
-    }
-
-    #money-received {
-      width: 100px;
-      padding: 4px;
-      font-size: 14px;
-      margin-left: 10px;
+    .footer-note {
+      margin-top: 20px;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.5);
     }
   </style>
 </head>
 <body>
-
-<!-- LOGIN SCREEN -->
-<div id="login-screen">
-  <h2>🔐 GCM Canteen Login</h2>
-  <input type="text" id="login-username" placeholder="Username" />
-  <input type="password" id="login-password" placeholder="Password" />
-  <button onclick="login()">Login</button>
-  <div id="login-error" style="color: yellow; margin-top: 10px;"></div>
-</div>
-
-<!-- POS UI -->
-<div id="pos-app">
-  <div class="header">
-    <div>📋 GCM Canteen Billing System – Developed by Elvinson</div>
-    <div id="clock"></div>
+  <div class="login-box">
+    <h3><i class="fas fa-utensils"></i> GCM Canteen Login</h3>
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()"><i class="fas fa-sign-in-alt"></i> Login</button>
+    <button id="installBtn" onclick="installApp()" class="button"><i class="fas fa-download"></i> Install App</button>
+    <div class="footer-note">Developed by: Elvinson</div>
   </div>
 
-  <div class="container">
-    <div class="product-panel">
-      <div class="product-grid" id="product-grid">Loading...</div>
-    </div>
+  <script>
+    const baseUrl = "https://script.google.com/a/macros/gcm.edu.ph/s/AKfycbwtzOOKBLNCaw0kVhh91-MbOw3LQ55ep2sIZ1CmddNItNEyKcr9eNe8JYPBSzH4uwGx6w/exec";
 
-    <div class="order-panel">
-      <div>
-        <div class="order-header">
-          <span>🧾 Order</span>
-        </div>
-        <div id="order-items" class="order-items"></div>
-        <div class="total" id="total-amount">₱0</div>
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-        <div class="payment-summary">
-          <div class="payment-line">
-            <label for="money-received">💰 Money Received:</label>
-            <input type="number" id="money-received" oninput="updateBalance()" />
-          </div>
-          <div class="payment-line">
-            🔁 Change to Return: <span id="change-amount">₱0</span>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="clear-btn" onclick="clearOrder()">Clear</button>
-          <button class="checkout-btn" onclick="checkoutOrder()">Checkout</button>
-          <button onclick="printReceipt()">🖨️ Print</button>
-        </div>
-
-        <div class="sales-summary" id="sales-total">Today’s Sales: ₱0</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-  let products = [];
-  let orderItems = [];
-
-  function login() {
-    const username = document.getElementById("login-username").value.trim();
-    const password = document.getElementById("login-password").value.trim();
-
-    const payload = { username, password };
-
-    google.script.run.withSuccessHandler(response => {
-      if (response.status === "success") {
-        document.getElementById("login-screen").style.display = "none";
-        document.getElementById("pos-app").style.display = "block";
-        loadProducts();
-      } else {
-        document.getElementById("login-error").innerText = response.message || "Invalid credentials.";
+      if (!username || !password) {
+        alert("Please enter both username and password.");
+        return;
       }
-    }).doPost({ postData: { contents: JSON.stringify(payload) } });
-  }
 
-  function loadProducts() {
-    google.script.run.withSuccessHandler(data => {
-      products = data.map(p => ({
-        id: p[0],
-        name: p[1],
-        price: p[2],
-        stock: p[3],
-        image: p[4]
-      }));
-      renderProducts();
-    }).getProducts();
-
-    updateSalesTotal();
-    startClock();
-  }
-
-  function renderProducts() {
-    const grid = document.getElementById("product-grid");
-    grid.innerHTML = "";
-    products.forEach(product => {
-      const stockClass = product.stock <= 5 ? 'product-name low-stock' : 'product-name';
-      const div = document.createElement("div");
-      div.className = "product";
-      div.innerHTML = `
-        <img src="${product.image}" alt="${product.name}">
-        <div class="${stockClass}">${product.name} (${product.stock})</div>
-      `;
-      div.onclick = () => {
-        if (product.stock <= 0) return alert("Out of stock!");
-        addToOrder(product.id);
-      };
-      grid.appendChild(div);
-    });
-  }
-
-  function addToOrder(productId) {
-    const product = products.find(p => p.id == productId);
-    if (!product || product.stock <= 0) return;
-
-    const existing = orderItems.find(item => item.id == productId);
-    if (existing) {
-      if (existing.qty >= product.stock) return alert("Not enough stock!");
-      existing.qty += 1;
-    } else {
-      orderItems.push({ ...product, qty: 1 });
+      google.script.run.withSuccessHandler(role => {
+        if (role === "invalid") {
+          alert("Invalid username or password!");
+        } else if (role === "admin") {
+          window.open(baseUrl + "?page=admin", "_top");
+        } else {
+          window.open(baseUrl + "?page=index", "_top");
+        }
+      }).authenticateUser(username, password);
     }
-    renderOrder();
-  }
 
-  function reduceItem(productId) {
-    const item = orderItems.find(p => p.id == productId);
-    if (!item) return;
-    item.qty -= 1;
-    if (item.qty <= 0) {
-      orderItems = orderItems.filter(p => p.id != productId);
-    }
-    renderOrder();
-  }
-
-  function renderOrder() {
-    const container = document.getElementById("order-items");
-    container.innerHTML = "";
-    let total = 0;
-
-    orderItems.forEach(item => {
-      total += item.price * item.qty;
-      container.innerHTML += `
-        <div class="item-row">
-          <div class="item-name">${item.name}</div>
-          <div class="item-qty">
-            <button onclick="reduceItem(${item.id})">−</button>
-            <span>${item.qty}</span>
-            <button onclick="addToOrder(${item.id})">+</button>
-          </div>
-          <div class="item-price">₱${(item.price * item.qty).toLocaleString()}</div>
-        </div>
-      `;
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") login();
     });
 
-    document.getElementById("total-amount").innerText = "₱" + total.toLocaleString();
-    updateBalance();
-  }
-
-  function clearOrder() {
-    orderItems = [];
-    renderOrder();
-  }
-
-  function updateBalance() {
-    const received = Number(document.getElementById("money-received").value);
-    const totalText = document.getElementById("total-amount").innerText.replace(/[₱,]/g, '');
-    const total = Number(totalText) || 0;
-    const change = Math.max(received - total, 0);
-    document.getElementById("change-amount").innerText = `₱${change.toLocaleString()}`;
-  }
-
-  function checkoutOrder() {
-    if (orderItems.length === 0) return alert("Order is empty!");
-
-    google.script.run.withSuccessHandler(msg => {
-      alert(msg);
-      clearOrder();
-      updateSalesTotal();
-      loadProducts();
-      document.getElementById("money-received").value = "";
-      document.getElementById("change-amount").innerText = "₱0";
-    }).recordFullOrder(orderItems);
-  }
-
-  function updateSalesTotal() {
-    google.script.run.withSuccessHandler(total => {
-      document.getElementById("sales-total").innerText = "Today’s Sales: ₱" + total.toLocaleString();
-    }).getTodaySalesTotal();
-  }
-
-  function startClock() {
-    function updateTime() {
-      const now = new Date();
-      document.getElementById("clock").innerText =
-        now.toLocaleDateString() + " " + now.toLocaleTimeString();
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register("service-worker.js")
+          .then(reg => console.log('Service Worker registered:', reg.scope))
+          .catch(err => console.error('Service Worker registration failed:', err));
+      });
     }
-    updateTime();
-    setInterval(updateTime, 1000);
-  }
 
-  function printReceipt() {
-    if (orderItems.length === 0) return alert("No items to print!");
-    let receiptContent = `
-      <h3>🧾 GCM Canteen Receipt</h3>
-      <p>${new Date().toLocaleString()}</p>
-      <table style="width:100%; border-collapse:collapse;">
-        <tr><th style="text-align:left;">Item</th><th>Qty</th><th>Price</th></tr>
-    `;
-    let total = 0;
-    orderItems.forEach(item => {
-      total += item.qty * item.price;
-      receiptContent += `
-        <tr>
-          <td>${item.name}</td>
-          <td style="text-align:center;">${item.qty}</td>
-          <td style="text-align:right;">₱${item.qty * item.price}</td>
-        </tr>
-      `;
+    // PWA Install Prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById("installBtn").style.display = "block";
     });
-    receiptContent += `
-      </table>
-      <hr>
-      <p style="text-align:right;"><strong>Total: ₱${total.toLocaleString()}</strong></p>
-      <p style="font-size:12px; text-align:center;">Thank you for your order!</p>
-    `;
-    const receiptWindow = window.open('', 'PRINT', 'height=600,width=400');
-    receiptWindow.document.write(`<html><head><title>Receipt</title></head><body>${receiptContent}</body></html>`);
-    receiptWindow.document.close();
-    receiptWindow.focus();
-    receiptWindow.print();
-  }
-</script>
+
+    function installApp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the A2HS prompt');
+          }
+          deferredPrompt = null;
+        });
+      }
+    }
+  </script>
 </body>
-</html>
+</html>  its is not getting login
