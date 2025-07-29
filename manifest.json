@@ -1,10 +1,11 @@
 {
-  "name": "GCM Canteen Billing",
-  "short_name": "Canteen",
+  "name": "GCM Canteen Billing System",
+  "short_name": "CanteenApp",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#28a745",
+  "theme_color": "#4CAF50",
+  "description": "Point of Sale system for Gullas College of Medicine Canteen.",
   "icons": [
     {
       "src": "icon-192.png",
