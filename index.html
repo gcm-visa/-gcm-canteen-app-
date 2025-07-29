@@ -3,92 +3,72 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - GCM Canteen</title>
+  <meta name="theme-color" content="#4CAF50" />
+  <title>GCM Canteen Billing System</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f0f4f8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .login-box {
-      background: #fff;
-      padding: 40px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
+      font-family: Arial, sans-serif;
       text-align: center;
+      padding: 40px;
     }
-
-    .login-box h2 {
-      margin-bottom: 20px;
-      color: #333;
+    h1 {
+      color: #4CAF50;
     }
-
-    .login-box input {
-      width: 100%;
-      padding: 12px 15px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+    #installBtn {
+      padding: 12px 24px;
       font-size: 16px;
-    }
-
-    .login-box button {
-      width: 100%;
-      padding: 12px;
       background-color: #4CAF50;
       color: white;
       border: none;
       border-radius: 8px;
-      font-size: 16px;
       cursor: pointer;
-      margin-top: 10px;
-    }
-
-    .login-box button:hover {
-      background-color: #45a049;
-    }
-
-    .error {
-      color: red;
-      font-size: 14px;
-      margin-top: 10px;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <div id="error" class="error"></div>
-  </div>
+  <h1>🍽 GCM Canteen Billing System</h1>
+  <p>Install this app to proceed.</p>
+
+  <button id="installBtn">📲 Install App</button>
 
   <script>
-    const users = {
-      "admin": "admin123",
-      "cashier": "cashier123"
-    };
+    const redirectURL = "https://script.google.com/a/macros/gcm.edu.ph/s/AKfycbwtzOOKBLNCaw0kVhh91-MbOw3LQ55ep2sIZ1CmddNItNEyKcr9eNe8JYPBSzH4uwGx6w/exec";
 
-    function login() {
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value.trim();
-      const errorDiv = document.getElementById("error");
-
-      if (users[user] && users[user] === pass) {
-        // ✅ Redirect to your main POS page
-        window.location.href = "https://script.google.com/a/macros/gcm.edu.ph/s/AKfycbwtzOOKBLNCaw0kVhh91-MbOw3LQ55ep2sIZ1CmddNItNEyKcr9eNe8JYPBSzH4uwGx6w/exec";
-      } else {
-        errorDiv.textContent = "Invalid username or password.";
-      }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('✅ Service Worker Registered'))
+        .catch(err => console.error('❌ SW registration failed:', err));
     }
+
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-block';
+
+      installBtn.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choiceResult => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('✅ App installed');
+          } else {
+            console.log('❌ App installation declined');
+          }
+          installBtn.style.display = 'none';
+          deferredPrompt = null;
+        });
+      });
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('✅ App successfully installed');
+      window.location.href = redirectURL;
+    });
   </script>
 </body>
 </html>
