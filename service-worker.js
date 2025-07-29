@@ -1,18 +1,16 @@
-const CACHE_NAME = 'canteen-cache-v1';
-const cacheFiles = [
-  './',
-  'index.html',
-  'manifest.json',
-  'icon-192.png',
-  'icon-512.png'
-];
-
-self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(cacheFiles)));
+self.addEventListener("install", (e) => {
+  console.log("Service Worker: Installed");
+  e.waitUntil(
+    caches.open("gcm-canteen-cache").then((cache) => {
+      return cache.addAll(["index.html", "manifest.json", "icon-192.png", "icon-512.png"]);
+    })
+  );
 });
 
-self.addEventListener('fetch', (event) => {
-  if (event.request.method === 'GET') {
-    event.respondWith(caches.match(event.request).then(r => r || fetch(event.request)));
-  }
+self.addEventListener("fetch", (e) => {
+  e.respondWith(
+    caches.match(e.request).then((response) => {
+      return response || fetch(e.request);
+    })
+  );
 });
