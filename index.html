@@ -2,64 +2,71 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>GCM Canteen Billing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#28a745" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#4CAF50" />
+  <title>GCM Canteen Billing System</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f3f3f3;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: Arial, sans-serif;
+      padding: 20px;
     }
-
-    .container {
-      text-align: center;
-    }
-
-    h1 {
-      color: #333;
-      margin-bottom: 20px;
-    }
-
-    .btn {
-      background-color: #28a745;
+    #installBtn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
       color: white;
       border: none;
-      padding: 15px 30px;
-      font-size: 18px;
       border-radius: 8px;
       cursor: pointer;
-    }
-
-    .btn:hover {
-      background-color: #218838;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>GCM Canteen Billing</h1>
-    <button class="btn" onclick="openBilling()">Open Billing App</button>
-  </div>
+  <h1>🍽 GCM Canteen Billing System</h1>
+  <p>Welcome to the real-time POS app for GCM Canteen!</p>
+
+  <button id="installBtn">📲 Install App</button>
 
   <script>
-    function openBilling() {
-      window.location.href =
-        "https://script.google.com/a/macros/gcm.edu.ph/s/AKfycbwtzOOKBLNCaw0kVhh91-MbOw3LQ55ep2sIZ1CmddNItNEyKcr9eNe8JYPBSzH4uwGx6w/exec";
+    // Register the service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('✅ Service Worker Registered'))
+        .catch(error => console.log('❌ SW registration failed:', error));
     }
 
-    // Register service worker
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", function () {
-        navigator.serviceWorker.register("service-worker.js");
+    // Show Install Button
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'inline-block';
+
+      installBtn.addEventListener('click', () => {
+        installBtn.disabled = true;
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('✅ App installed');
+          } else {
+            console.log('❌ App installation declined');
+          }
+          installBtn.style.display = 'none';
+          deferredPrompt = null;
+        });
       });
-    }
+    });
+
+    // Optional: hide button after install
+    window.addEventListener('appinstalled', () => {
+      console.log('✅ App successfully installed');
+      installBtn.style.display = 'none';
+    });
   </script>
 </body>
 </html>
