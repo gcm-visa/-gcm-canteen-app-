@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>GCM Canteen Billing</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#28a745" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f3f3f3;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f3f3f3;
+      margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
     }
 
     .container {
@@ -20,7 +23,7 @@
     }
 
     h1 {
-      color: #222;
+      color: #333;
       margin-bottom: 20px;
     }
 
@@ -28,11 +31,10 @@
       background-color: #28a745;
       color: white;
       border: none;
-      padding: 14px 30px;
+      padding: 15px 30px;
       font-size: 18px;
       border-radius: 8px;
       cursor: pointer;
-      transition: background-color 0.3s;
     }
 
     .btn:hover {
@@ -42,13 +44,21 @@
 </head>
 <body>
   <div class="container">
-    <h1>GCM Canteen Billing System</h1>
+    <h1>GCM Canteen Billing</h1>
     <button class="btn" onclick="openBilling()">Open Billing App</button>
   </div>
 
   <script>
     function openBilling() {
-      window.location.href = "https://script.google.com/a/macros/gcm.edu.ph/s/AKfycbwtzOOKBLNCaw0kVhh91-MbOw3LQ55ep2sIZ1CmddNItNEyKcr9eNe8JYPBSzH4uwGx6w/exec";
+      window.location.href =
+        "https://script.google.com/a/macros/gcm.edu.ph/s/AKfycbwtzOOKBLNCaw0kVhh91-MbOw3LQ55ep2sIZ1CmddNItNEyKcr9eNe8JYPBSzH4uwGx6w/exec";
+    }
+
+    // Register service worker
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("service-worker.js");
+      });
     }
   </script>
 </body>
